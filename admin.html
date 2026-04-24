@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDM Admin - Download Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a1a;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .admin-header h1 {
+            font-size: 1.5em;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .admin-header .badge {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #667eea;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .refresh-btn, .clear-btn, .export-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .clear-btn {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .clear-btn:hover {
+            background: rgba(231, 76, 60, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .export-btn {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .export-btn:hover {
+            background: rgba(46, 204, 113, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .dashboard {
+            padding: 30px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+
+        .stat-card:nth-child(1) .icon { background: rgba(102, 126, 234, 0.2); }
+        .stat-card:nth-child(2) .icon { background: rgba(46, 204, 113, 0.2); }
+        .stat-card:nth-child(3) .icon { background: rgba(241, 196, 15, 0.2); }
+        .stat-card:nth-child(4) .icon { background: rgba(231, 76, 60, 0.2); }
+
+        .stat-card .value {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-card:nth-child(1) .value { color: #667eea; }
+        .stat-card:nth-child(2) .value { color: #2ecc71; }
+        .stat-card:nth-child(3) .value { color: #f1c40f; }
+        .stat-card:nth-child(4) .value { color: #e74c3c; }
+
+        .stat-card .label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9em;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tables-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 900px) {
+            .tables-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+            .dashboard {
+                padding: 20px 15px;
+            }
+            .header-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        .table-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .table-card-header {
+            padding: 18px 22px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            font-weight: 600;
+            font-size: 1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-card-header .count-badge {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+        }
+
+        .table-scroll {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .table-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .table-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(102, 126, 234, 0.08);
+        }
+
+        tbody td {
+            padding: 13px 18px;
+            font-size: 0.9em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .ip-cell {
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .time-cell {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85em;
+        }
+
+        .attempts-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .attempts-1 {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+        }
+
+        .attempts-multi {
+            background: rgba(241, 196, 15, 0.15);
+            color: #f1c40f;
+        }
+
+        .counted-yes {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+
+        .counted-no {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 1em;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(46, 204, 113, 0); }
+        }
+
+        .auto-refresh-label {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .search-box {
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9em;
+            outline: none;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .confirm-modal.show {
+            display: flex;
+        }
+
+        .confirm-box {
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 35px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .confirm-box h3 {
+            margin-bottom: 10px;
+            color: #e74c3c;
+        }
+
+        .confirm-box p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 25px;
+        }
+
+        .confirm-box .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .confirm-box button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-yes {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .confirm-no {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-header">
+        <div style="display:flex;align-items:center;gap:15px;">
+            <h1>📊 TDM Admin Panel</h1>
+            <span class="badge"><span class="live-dot"></span>Live</span>
+        </div>
+        <div class="header-actions">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search IP..." oninput="renderAll()">
+            <div class="auto-refresh-label">Auto-refresh: <span id="countdown">5</span>s</div>
+            <button class="refresh-btn" onclick="renderAll()">⟳ Refresh</button>
+            <button class="export-btn" onclick="exportCSV()">📥 Export CSV</button>
+            <button class="clear-btn" onclick="showConfirm()">🗑 Clear All</button>
+    </div>
+
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-box">
+            <h3>⚠️ Clear All Data?</h3>
+            <p>This will permanently delete all download records. This action cannot be undone.</p>
+            <div class="btn-group">
+                <button class="confirm-yes" onclick="clearAllData()">Yes, Clear Everything</button>
+                <button class="confirm-no" onclick="hideConfirm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">👥</div>
+                <div class="value" id="uniqueDownloads">0</div>
+                <div class="label">Unique Downloads</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">📥</div>
+                <div class="value" id="totalAttempts">0</div>
+                <div class="label">Total Attempts</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🔁</div>
+                <div class="value" id="repeatDownloads">0</div>
+                <div class="label">Repeat Visitors</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🕐</div>
+                <div class="value" id="lastDownload">—</div>
+                <div class="label">Last Download</div>
+            </div>
+        </div>
+
+        <div class="tables-grid">
+            <div class="table-card">
+                <div class="table-card-header">
+                    <span>🌐 Unique IPs (Counted as 1 each)</span>
+                    <span class="count-badge" id="ipCountBadge">0</span>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>IP / Fingerprint</th>
+                                <th>First Download</th>
+                                <th>Attempts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ipTableBody">
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="ipEmpty" style="display:none;">
+                        <div class="empty-icon">📭</div>
+                        <p>No downloads yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-card-header">
+                    <span>📋 Full Activity Log</span>
+                    <span class="count-badge" id="logCountBadge">0</span>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>IP / Fingerprint</th>
+                                <th>Timestamp</th>
+                                <th>Counted?</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logTableBody">
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="logEmpty" style="display:none;">
+                        <div class="empty-icon">📭</div>
+                        <p>No activity yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DB_KEY = 'tdm_downloads_db';
+
+        function getDB() {
+            try {
+                const data = localStorage.getItem(DB_KEY);
+                return data ? JSON.parse(data) : { ips: {}, log: [] };
+            } catch (e) {
+                return { ips: {}, log: [] };
+            }
+        }
+
+        function saveDB(db) {
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+        }
+
+        function formatDate(isoString) {
+            if (!isoString) return '—';
+            const d = new Date(isoString);
+            const now = new Date();
+            const diff = Math.floor((now - d) / 1000);
+
+            if (diff < 60) return diff + 's ago';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+
+            return d.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatFullDate(isoString) {
+            if (!isoString) return '—';
+            const d = new Date(isoString);
+            return d.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        function truncateIP(ip) {
+            if (!ip) return '—';
+            if (ip.length > 18) return ip.substring(0, 15) + '...';
+            return ip;
+        }
+
+        function renderAll() {
+            const db = getDB();
+            const searchTerm = (document.getElementById('searchBox').value || '').toLowerCase().trim();
+
+            // ---- Stats ----
+            const ips = Object.keys(db.ips);
+            const totalAttempts = db.log ? db.log.length : 0;
+            let repeatCount = 0;
+            let lastTime = null;
+
+            ips.forEach(ip => {
+                if (db.ips[ip].attempts > 1) repeatCount++;
+                const ft = db.ips[ip].firstDownload;
+                const lt = db.ips[ip].lastAttempt || ft;
+                if (!lastTime || new Date(lt) > new Date(lastTime)) lastTime = lt;
+                if (!lastTime || new Date(ft) > new Date(lastTime)) lastTime = ft;
+            });
+
+            document.getElementById('uniqueDownloads').textContent = ips.length;
+            document.getElementById('totalAttempts').textContent = totalAttempts;
+            document.getElementById('repeatDownloads').textContent = repeatCount;
+            document.getElementById('lastDownload').textContent = formatDate(lastTime);
+
+            // ---- IP Table ----
+            const ipTableBody = document.getElementById('ipTableBody');
+            const ipEmpty = document.getElementById('ipEmpty');
+
+            // Filter IPs
+            let filteredIPs = ips;
+            if (searchTerm) {
+                filteredIPs = ips.filter(ip => ip.toLowerCase().includes(searchTerm));
+            }
+
+            // Sort by firstDownload descending (newest first)
+            filteredIPs.sort((a, b) => {
+                return new Date(db.ips[b].firstDownload) - new Date(db.ips[a].firstDownload);
+            });
+
+            document.getElementById('ipCountBadge').textContent = filteredIPs.length;
+
+            if (filteredIPs.length === 0) {
+                ipTableBody.innerHTML = '';
+                ipEmpty.style.display = 'block';
+            } else {
+                ipEmpty.style.display = 'none';
+                let ipHTML = '';
+                filteredIPs.forEach((ip, index) => {
+                    const info = db.ips[ip];
+                    const attemptsClass = info.attempts > 1 ? 'attempts-multi' : 'attempts-1';
+                    ipHTML += `
+                        <tr>
+                            <td style="color:rgba(255,255,255,0.3)">${index + 1}</td>
+                            <td class="ip-cell" title="${ip}">${truncateIP(ip)}</td>
+                            <td class="time-cell" title="${formatFullDate(info.firstDownload)}">${formatDate(info.firstDownload)}</td>
+                            <td><span class="attempts-badge ${attemptsClass}">${info.attempts}×</span></td>
+                        </tr>
+                    `;
+                });
+                ipTableBody.innerHTML = ipHTML;
+            }
+
+            // ---- Log Table ----
+            const logTableBody = document.getElementById('logTableBody');
+            const logEmpty = document.getElementById('logEmpty');
+            const logs = db.log || [];
+
+            // Filter logs
+            let filteredLogs = logs;
+            if (searchTerm) {
+                filteredLogs = logs.filter(entry => entry.ip.toLowerCase().includes(searchTerm));
+            }
+
+            // Reverse so newest is on top
+            const reversedLogs = [...filteredLogs].reverse();
+
+            document.getElementById('logCountBadge').textContent = filteredLogs.length;
+
+            if (reversedLogs.length === 0) {
+                logTableBody.innerHTML = '';
+                logEmpty.style.display = 'block';
+            } else {
+                logEmpty.style.display = 'none';
+                let logHTML = '';
+                reversedLogs.forEach((entry, index) => {
+                    const countedClass = entry.counted ? 'counted-yes' : 'counted-no';
+                    const countedText = entry.counted ? '✓ Yes' : '✗ Duplicate';
+                    logHTML += `
+                        <tr>
+                            <td style="color:rgba(255,255,255,0.3)">${filteredLogs.length - index}</td>
+                            <td class="ip-cell" title="${entry.ip}">${truncateIP(entry.ip)}</td>
+                            <td class="time-cell" title="${formatFullDate(entry.timestamp)}">${formatDate(entry.timestamp)}</td>
+                            <td class="${countedClass}">${countedText}</td>
+                        </tr>
+                    `;
+                });
+                logTableBody.innerHTML = logHTML;
+            }
+        }
+
+        // ---- Confirm Modal ----
+        function showConfirm() {
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        function hideConfirm() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+
+        function clearAllData() {
+            localStorage.removeItem(DB_KEY);
+            hideConfirm();
+            renderAll();
+        }
+
+        // ---- Export CSV ----
+        function exportCSV() {
+            const db = getDB();
+            const ips = Object.keys(db.ips);
+
+            if (ips.length === 0) {
+                alert('No data to export.');
+                return;
+            }
+
+            let csv = 'IP/Fingerprint,First Download,Last Attempt,Total Attempts,Counted As\n';
+
+            ips.forEach(ip => {
+                const info = db.ips[ip];
+                const lastAttempt = info.lastAttempt || info.firstDownload;
+                csv += `"${ip}","${info.firstDownload}","${lastAttempt}",${info.attempts},1\n`;
+            });
+
+            csv += '\n\n--- Full Log ---\n';
+            csv += 'IP/Fingerprint,Timestamp,Counted\n';
+
+            (db.log || []).forEach(entry => {
+                csv += `"${entry.ip}","${entry.timestamp}",${entry.counted ? 'Yes' : 'No'}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tdm_downloads_report.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ---- Auto Refresh ----
+        let countdownValue = 5;
+
+        function startAutoRefresh() {
+            setInterval(() => {
+                countdownValue--;
+                if (countdownValue <= 0) {
+                    countdownValue = 5;
+                    renderAll();
+                }
+                document.getElementById('countdown').textContent = countdownValue;
+            }, 1000);
+        }
+
+        // ---- Init ----
+        renderAll();
+        startAutoRefresh();
+    </script>
+</body>
+</html>

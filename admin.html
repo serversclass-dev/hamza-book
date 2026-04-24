@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TDM Admin - Download Analytics</title>
+    <title>TDM Admin</title>
     <style>
         * {
             margin: 0;
@@ -12,230 +12,184 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0a1a;
-            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a1a;
             min-height: 100vh;
         }
 
-        .admin-header {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 20px 40px;
+        .header {
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 16px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(10px);
             position: sticky;
             top: 0;
             z-index: 10;
         }
 
-        .admin-header h1 {
-            font-size: 1.5em;
-            background: linear-gradient(to right, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .header h1 {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #1a1a1a;
         }
 
-        .admin-header .badge {
-            background: rgba(102, 126, 234, 0.2);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            color: #667eea;
-        }
-
-        .header-actions {
+        .header-right {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
         }
 
-        .refresh-btn, .clear-btn, .export-btn {
-            padding: 10px 20px;
+        .btn {
+            padding: 8px 18px;
             border: none;
-            border-radius: 10px;
-            font-size: 0.9em;
+            border-radius: 6px;
+            font-size: 0.85em;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: opacity 0.2s;
         }
 
-        .refresh-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        .btn:hover {
+            opacity: 0.85;
         }
 
-        .refresh-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        .btn-primary {
+            background: #2563eb;
+            color: #fff;
         }
 
-        .clear-btn {
-            background: rgba(231, 76, 60, 0.15);
-            color: #e74c3c;
-            border: 1px solid rgba(231, 76, 60, 0.3);
+        .btn-danger {
+            background: #fff;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
         }
 
-        .clear-btn:hover {
-            background: rgba(231, 76, 60, 0.25);
-            transform: translateY(-2px);
+        .btn-green {
+            background: #fff;
+            color: #16a34a;
+            border: 1px solid #86efac;
         }
 
-        .export-btn {
-            background: rgba(46, 204, 113, 0.15);
-            color: #2ecc71;
-            border: 1px solid rgba(46, 204, 113, 0.3);
+        .search-input {
+            padding: 8px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.85em;
+            outline: none;
+            width: 180px;
+            transition: border-color 0.2s;
         }
 
-        .export-btn:hover {
-            background: rgba(46, 204, 113, 0.25);
-            transform: translateY(-2px);
+        .search-input:focus {
+            border-color: #2563eb;
         }
 
-        .dashboard {
-            padding: 30px 40px;
-            max-width: 1400px;
-            margin: 0 auto;
+        .auto-label {
+            font-size: 0.8em;
+            color: #999;
         }
 
-        .stats-grid {
+        .main {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+
+        .stats-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 35px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 25px;
         }
 
-        .stat-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 25px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            background: rgba(255, 255, 255, 0.07);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .stat-card .icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4em;
-            margin-bottom: 15px;
-        }
-
-        .stat-card:nth-child(1) .icon { background: rgba(102, 126, 234, 0.2); }
-        .stat-card:nth-child(2) .icon { background: rgba(46, 204, 113, 0.2); }
-        .stat-card:nth-child(3) .icon { background: rgba(241, 196, 15, 0.2); }
-        .stat-card:nth-child(4) .icon { background: rgba(231, 76, 60, 0.2); }
-
-        .stat-card .value {
-            font-size: 2.2em;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .stat-card:nth-child(1) .value { color: #667eea; }
-        .stat-card:nth-child(2) .value { color: #2ecc71; }
-        .stat-card:nth-child(3) .value { color: #f1c40f; }
-        .stat-card:nth-child(4) .value { color: #e74c3c; }
-
-        .stat-card .label {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9em;
-        }
-
-        .section-title {
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .tables-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-
-        @media (max-width: 900px) {
-            .tables-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 700px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
             }
-            .admin-header {
+            .header {
                 flex-direction: column;
-                gap: 15px;
-                padding: 15px 20px;
+                gap: 12px;
+                padding: 14px 16px;
             }
-            .dashboard {
-                padding: 20px 15px;
-            }
-            .header-actions {
+            .header-right {
                 flex-wrap: wrap;
                 justify-content: center;
             }
+            .tables-row {
+                grid-template-columns: 1fr !important;
+            }
         }
 
-        .table-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
+        .stat-box {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-box .num {
+            font-size: 2em;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-box .lbl {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .stat-box:nth-child(1) .num { color: #2563eb; }
+        .stat-box:nth-child(2) .num { color: #16a34a; }
+        .stat-box:nth-child(3) .num { color: #ea580c; }
+        .stat-box:nth-child(4) .num { color: #7c3aed; }
+
+        .tables-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
             overflow: hidden;
         }
 
-        .table-card-header {
-            padding: 18px 22px;
-            background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        .card-head {
+            padding: 14px 18px;
+            border-bottom: 1px solid #f0f0f0;
             font-weight: 600;
-            font-size: 1em;
+            font-size: 0.95em;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .table-card-header .count-badge {
-            background: rgba(102, 126, 234, 0.2);
-            color: #667eea;
-            padding: 3px 12px;
-            border-radius: 20px;
+        .card-head .cnt {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 2px 10px;
+            border-radius: 12px;
             font-size: 0.8em;
+            font-weight: 700;
         }
 
-        .table-scroll {
-            max-height: 450px;
+        .card-scroll {
+            max-height: 420px;
             overflow-y: auto;
         }
 
-        .table-scroll::-webkit-scrollbar {
-            width: 6px;
+        .card-scroll::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .table-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .table-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+        .card-scroll::-webkit-scrollbar-thumb {
+            background: #ddd;
             border-radius: 3px;
         }
 
@@ -245,289 +199,229 @@
         }
 
         thead th {
-            padding: 14px 18px;
+            padding: 10px 16px;
             text-align: left;
-            font-size: 0.8em;
+            font-size: 0.75em;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.4);
-            background: rgba(255, 255, 255, 0.02);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            letter-spacing: 0.5px;
+            color: #999;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
             position: sticky;
             top: 0;
-            z-index: 2;
-        }
-
-        tbody tr {
-            transition: background 0.2s ease;
-        }
-
-        tbody tr:hover {
-            background: rgba(102, 126, 234, 0.08);
         }
 
         tbody td {
-            padding: 13px 18px;
-            font-size: 0.9em;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        .ip-cell {
-            font-family: 'Courier New', monospace;
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .time-cell {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.85em;
-        }
-
-        .attempts-badge {
-            display: inline-block;
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .attempts-1 {
-            background: rgba(46, 204, 113, 0.15);
-            color: #2ecc71;
-        }
-
-        .attempts-multi {
-            background: rgba(241, 196, 15, 0.15);
-            color: #f1c40f;
-        }
-
-        .counted-yes {
-            color: #2ecc71;
-            font-weight: 600;
-        }
-
-        .counted-no {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .empty-state .empty-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-        }
-
-        .empty-state p {
-            font-size: 1em;
-        }
-
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: #2ecc71;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
-            50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(46, 204, 113, 0); }
-        }
-
-        .auto-refresh-label {
-            font-size: 0.8em;
-            color: rgba(255, 255, 255, 0.4);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .search-box {
             padding: 10px 16px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.88em;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        tbody tr:hover {
+            background: #f8faff;
+        }
+
+        .ip {
+            font-family: 'SF Mono', 'Courier New', monospace;
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        .time {
+            color: #888;
+            font-size: 0.82em;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
             border-radius: 10px;
-            color: white;
-            font-size: 0.9em;
-            outline: none;
-            width: 200px;
-            transition: all 0.3s ease;
+            font-size: 0.8em;
+            font-weight: 600;
         }
 
-        .search-box:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        .badge-1 {
+            background: #f0fdf4;
+            color: #16a34a;
         }
 
-        .search-box::placeholder {
-            color: rgba(255, 255, 255, 0.3);
+        .badge-multi {
+            background: #fff7ed;
+            color: #ea580c;
         }
 
-        .confirm-modal {
+        .yes {
+            color: #16a34a;
+            font-weight: 600;
+        }
+
+        .no {
+            color: #ccc;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: #bbb;
+        }
+
+        .empty-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .modal-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.4);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 100;
-            backdrop-filter: blur(5px);
         }
 
-        .confirm-modal.show {
+        .modal-bg.show {
             display: flex;
         }
 
-        .confirm-box {
-            background: #1a1a2e;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 35px;
-            text-align: center;
-            max-width: 400px;
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 360px;
             width: 90%;
+            text-align: center;
         }
 
-        .confirm-box h3 {
-            margin-bottom: 10px;
-            color: #e74c3c;
+        .modal h3 {
+            margin-bottom: 8px;
+            color: #dc2626;
+            font-size: 1.1em;
         }
 
-        .confirm-box p {
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 25px;
+        .modal p {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 20px;
         }
 
-        .confirm-box .btn-group {
+        .modal-btns {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
         }
 
-        .confirm-box button {
-            padding: 10px 25px;
+        .modal-btns button {
+            padding: 9px 22px;
             border: none;
-            border-radius: 10px;
+            border-radius: 6px;
             font-weight: 600;
+            font-size: 0.9em;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
 
-        .confirm-yes {
-            background: #e74c3c;
-            color: white;
+        .modal-yes {
+            background: #dc2626;
+            color: #fff;
         }
 
-        .confirm-no {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+        .modal-no {
+            background: #f3f4f6;
+            color: #333;
         }
     </style>
 </head>
 <body>
 
-    <div class="admin-header">
-        <div style="display:flex;align-items:center;gap:15px;">
-            <h1>📊 TDM Admin Panel</h1>
-            <span class="badge"><span class="live-dot"></span>Live</span>
-        </div>
-        <div class="header-actions">
-            <input type="text" class="search-box" id="searchBox" placeholder="Search IP..." oninput="renderAll()">
-            <div class="auto-refresh-label">Auto-refresh: <span id="countdown">5</span>s</div>
-            <button class="refresh-btn" onclick="renderAll()">⟳ Refresh</button>
-            <button class="export-btn" onclick="exportCSV()">📥 Export CSV</button>
-            <button class="clear-btn" onclick="showConfirm()">🗑 Clear All</button>
-    </div>
-
-    <div class="confirm-modal" id="confirmModal">
-        <div class="confirm-box">
-            <h3>⚠️ Clear All Data?</h3>
-            <p>This will permanently delete all download records. This action cannot be undone.</p>
-            <div class="btn-group">
-                <button class="confirm-yes" onclick="clearAllData()">Yes, Clear Everything</button>
-                <button class="confirm-no" onclick="hideConfirm()">Cancel</button>
-            </div>
+    <div class="header">
+        <h1>TDM Admin Panel</h1>
+        <div class="header-right">
+            <input type="text" class="search-input" id="searchBox" placeholder="Search IP..." oninput="renderAll()">
+            <span class="auto-label">Auto: <span id="countdown">5</span>s</span>
+            <button class="btn btn-primary" onclick="renderAll()">Refresh</button>
+            <button class="btn btn-green" onclick="exportCSV()">Export</button>
+            <button class="btn btn-danger" onclick="showModal()">Clear All</button>
         </div>
     </div>
 
-    <div class="dashboard">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="icon">👥</div>
-                <div class="value" id="uniqueDownloads">0</div>
-                <div class="label">Unique Downloads</div>
+    <div class="modal-bg" id="modalBg">
+        <div class="modal">
+            <h3>Clear All Data?</h3>
+            <p>This will delete all download records permanently.</p>
+            <div class="modal-btns">
+                <button class="modal-yes" onclick="clearAll()">Yes, Clear</button>
+                <button class="modal-no" onclick="hideModal()">Cancel</button>
             </div>
-            <div class="stat-card">
-                <div class="icon">📥</div>
-                <div class="value" id="totalAttempts">0</div>
-                <div class="label">Total Attempts</div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="num" id="sUnique">0</div>
+                <div class="lbl">Unique Downloads</div>
             </div>
-            <div class="stat-card">
-                <div class="icon">🔁</div>
-                <div class="value" id="repeatDownloads">0</div>
-                <div class="label">Repeat Visitors</div>
+            <div class="stat-box">
+                <div class="num" id="sTotal">0</div>
+                <div class="lbl">Total Attempts</div>
             </div>
-            <div class="stat-card">
-                <div class="icon">🕐</div>
-                <div class="value" id="lastDownload">—</div>
-                <div class="label">Last Download</div>
+            <div class="stat-box">
+                <div class="num" id="sRepeat">0</div>
+                <div class="lbl">Repeat Visitors</div>
+            </div>
+            <div class="stat-box">
+                <div class="num" id="sLast">—</div>
+                <div class="lbl">Last Download</div>
             </div>
         </div>
 
-        <div class="tables-grid">
-            <div class="table-card">
-                <div class="table-card-header">
-                    <span>🌐 Unique IPs (Counted as 1 each)</span>
-                    <span class="count-badge" id="ipCountBadge">0</span>
+        <div class="tables-row">
+            <div class="card">
+                <div class="card-head">
+                    <span>Unique IPs</span>
+                    <span class="cnt" id="cntIP">0</span>
                 </div>
-                <div class="table-scroll">
+                <div class="card-scroll">
                     <table>
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>IP / Fingerprint</th>
-                                <th>First Download</th>
+                                <th>IP</th>
+                                <th>First Seen</th>
                                 <th>Attempts</th>
                             </tr>
                         </thead>
-                        <tbody id="ipTableBody">
-                        </tbody>
+                        <tbody id="tbIP"></tbody>
                     </table>
-                    <div class="empty-state" id="ipEmpty" style="display:none;">
+                    <div class="empty" id="emIP" style="display:none">
                         <div class="empty-icon">📭</div>
                         <p>No downloads yet</p>
                     </div>
                 </div>
             </div>
 
-            <div class="table-card">
-                <div class="table-card-header">
-                    <span>📋 Full Activity Log</span>
-                    <span class="count-badge" id="logCountBadge">0</span>
+            <div class="card">
+                <div class="card-head">
+                    <span>Activity Log</span>
+                    <span class="cnt" id="cntLog">0</span>
                 </div>
-                <div class="table-scroll">
+                <div class="card-scroll">
                     <table>
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>IP / Fingerprint</th>
-                                <th>Timestamp</th>
-                                <th>Counted?</th>
+                                <th>IP</th>
+                                <th>Time</th>
+                                <th>Counted</th>
                             </tr>
                         </thead>
-                        <tbody id="logTableBody">
-                        </tbody>
+                        <tbody id="tbLog"></tbody>
                     </table>
-                    <div class="empty-state" id="logEmpty" style="display:none;">
+                    <div class="empty" id="emLog" style="display:none">
                         <div class="empty-icon">📭</div>
                         <p>No activity yet</p>
                     </div>
@@ -541,222 +435,157 @@
 
         function getDB() {
             try {
-                const data = localStorage.getItem(DB_KEY);
-                return data ? JSON.parse(data) : { ips: {}, log: [] };
+                const d = localStorage.getItem(DB_KEY);
+                return d ? JSON.parse(d) : { ips: {}, log: [] };
             } catch (e) {
                 return { ips: {}, log: [] };
             }
         }
 
-        function saveDB(db) {
-            localStorage.setItem(DB_KEY, JSON.stringify(db));
+        function fmtTime(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            const s = Math.floor((new Date() - d) / 1000);
+            if (s < 60) return s + 's ago';
+            if (s < 3600) return Math.floor(s / 60) + 'm ago';
+            if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+            if (s < 604800) return Math.floor(s / 86400) + 'd ago';
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
 
-        function formatDate(isoString) {
-            if (!isoString) return '—';
-            const d = new Date(isoString);
-            const now = new Date();
-            const diff = Math.floor((now - d) / 1000);
-
-            if (diff < 60) return diff + 's ago';
-            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-            if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-
-            return d.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+        function fmtFull(iso) {
+            if (!iso) return '—';
+            return new Date(iso).toLocaleString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
             });
         }
 
-        function formatFullDate(isoString) {
-            if (!isoString) return '—';
-            const d = new Date(isoString);
-            return d.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        }
-
-        function truncateIP(ip) {
+        function shortIP(ip) {
             if (!ip) return '—';
-            if (ip.length > 18) return ip.substring(0, 15) + '...';
-            return ip;
+            return ip.length > 18 ? ip.substring(0, 15) + '...' : ip;
         }
 
         function renderAll() {
             const db = getDB();
-            const searchTerm = (document.getElementById('searchBox').value || '').toLowerCase().trim();
-
-            // ---- Stats ----
+            const search = (document.getElementById('searchBox').value || '').toLowerCase().trim();
             const ips = Object.keys(db.ips);
-            const totalAttempts = db.log ? db.log.length : 0;
-            let repeatCount = 0;
-            let lastTime = null;
-
-            ips.forEach(ip => {
-                if (db.ips[ip].attempts > 1) repeatCount++;
-                const ft = db.ips[ip].firstDownload;
-                const lt = db.ips[ip].lastAttempt || ft;
-                if (!lastTime || new Date(lt) > new Date(lastTime)) lastTime = lt;
-                if (!lastTime || new Date(ft) > new Date(lastTime)) lastTime = ft;
-            });
-
-            document.getElementById('uniqueDownloads').textContent = ips.length;
-            document.getElementById('totalAttempts').textContent = totalAttempts;
-            document.getElementById('repeatDownloads').textContent = repeatCount;
-            document.getElementById('lastDownload').textContent = formatDate(lastTime);
-
-            // ---- IP Table ----
-            const ipTableBody = document.getElementById('ipTableBody');
-            const ipEmpty = document.getElementById('ipEmpty');
-
-            // Filter IPs
-            let filteredIPs = ips;
-            if (searchTerm) {
-                filteredIPs = ips.filter(ip => ip.toLowerCase().includes(searchTerm));
-            }
-
-            // Sort by firstDownload descending (newest first)
-            filteredIPs.sort((a, b) => {
-                return new Date(db.ips[b].firstDownload) - new Date(db.ips[a].firstDownload);
-            });
-
-            document.getElementById('ipCountBadge').textContent = filteredIPs.length;
-
-            if (filteredIPs.length === 0) {
-                ipTableBody.innerHTML = '';
-                ipEmpty.style.display = 'block';
-            } else {
-                ipEmpty.style.display = 'none';
-                let ipHTML = '';
-                filteredIPs.forEach((ip, index) => {
-                    const info = db.ips[ip];
-                    const attemptsClass = info.attempts > 1 ? 'attempts-multi' : 'attempts-1';
-                    ipHTML += `
-                        <tr>
-                            <td style="color:rgba(255,255,255,0.3)">${index + 1}</td>
-                            <td class="ip-cell" title="${ip}">${truncateIP(ip)}</td>
-                            <td class="time-cell" title="${formatFullDate(info.firstDownload)}">${formatDate(info.firstDownload)}</td>
-                            <td><span class="attempts-badge ${attemptsClass}">${info.attempts}×</span></td>
-                        </tr>
-                    `;
-                });
-                ipTableBody.innerHTML = ipHTML;
-            }
-
-            // ---- Log Table ----
-            const logTableBody = document.getElementById('logTableBody');
-            const logEmpty = document.getElementById('logEmpty');
             const logs = db.log || [];
 
-            // Filter logs
-            let filteredLogs = logs;
-            if (searchTerm) {
-                filteredLogs = logs.filter(entry => entry.ip.toLowerCase().includes(searchTerm));
-            }
+            // Stats
+            let repeats = 0, lastT = null;
+            ips.forEach(ip => {
+                if (db.ips[ip].attempts > 1) repeats++;
+                const t = db.ips[ip].lastAttempt || db.ips[ip].firstDownload;
+                if (!lastT || new Date(t) > new Date(lastT)) lastT = t;
+            });
 
-            // Reverse so newest is on top
-            const reversedLogs = [...filteredLogs].reverse();
+            document.getElementById('sUnique').textContent = ips.length;
+            document.getElementById('sTotal').textContent = logs.length;
+            document.getElementById('sRepeat').textContent = repeats;
+            document.getElementById('sLast').textContent = fmtTime(lastT);
 
-            document.getElementById('logCountBadge').textContent = filteredLogs.length;
+            // IP Table
+            let fIPs = search ? ips.filter(ip => ip.toLowerCase().includes(search)) : ips;
+            fIPs.sort((a, b) => new Date(db.ips[b].firstDownload) - new Date(db.ips[a].firstDownload));
 
-            if (reversedLogs.length === 0) {
-                logTableBody.innerHTML = '';
-                logEmpty.style.display = 'block';
+            document.getElementById('cntIP').textContent = fIPs.length;
+            const tbIP = document.getElementById('tbIP');
+            const emIP = document.getElementById('emIP');
+
+            if (fIPs.length === 0) {
+                tbIP.innerHTML = '';
+                emIP.style.display = 'block';
             } else {
-                logEmpty.style.display = 'none';
-                let logHTML = '';
-                reversedLogs.forEach((entry, index) => {
-                    const countedClass = entry.counted ? 'counted-yes' : 'counted-no';
-                    const countedText = entry.counted ? '✓ Yes' : '✗ Duplicate';
-                    logHTML += `
-                        <tr>
-                            <td style="color:rgba(255,255,255,0.3)">${filteredLogs.length - index}</td>
-                            <td class="ip-cell" title="${entry.ip}">${truncateIP(entry.ip)}</td>
-                            <td class="time-cell" title="${formatFullDate(entry.timestamp)}">${formatDate(entry.timestamp)}</td>
-                            <td class="${countedClass}">${countedText}</td>
-                        </tr>
-                    `;
-                });
-                logTableBody.innerHTML = logHTML;
+                emIP.style.display = 'none';
+                tbIP.innerHTML = fIPs.map((ip, i) => {
+                    const info = db.ips[ip];
+                    const bc = info.attempts > 1 ? 'badge-multi' : 'badge-1';
+                    return `<tr>
+                        <td style="color:#bbb">${i + 1}</td>
+                        <td class="ip" title="${ip}">${shortIP(ip)}</td>
+                        <td class="time" title="${fmtFull(info.firstDownload)}">${fmtTime(info.firstDownload)}</td>
+                        <td><span class="badge ${bc}">${info.attempts}×</span></td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // Log Table
+            let fLogs = search ? logs.filter(e => e.ip.toLowerCase().includes(search)) : logs;
+            const rev = [...fLogs].reverse();
+
+            document.getElementById('cntLog').textContent = fLogs.length;
+            const tbLog = document.getElementById('tbLog');
+            const emLog = document.getElementById('emLog');
+
+            if (rev.length === 0) {
+                tbLog.innerHTML = '';
+                emLog.style.display = 'block';
+            } else {
+                emLog.style.display = 'none';
+                tbLog.innerHTML = rev.map((e, i) => {
+                    const cc = e.counted ? 'yes' : 'no';
+                    const ct = e.counted ? '✓ Yes' : '— No';
+                    return `<tr>
+                        <td style="color:#bbb">${fLogs.length - i}</td>
+                        <td class="ip" title="${e.ip}">${shortIP(e.ip)}</td>
+                        <td class="time" title="${fmtFull(e.timestamp)}">${fmtTime(e.timestamp)}</td>
+                        <td class="${cc}">${ct}</td>
+                    </tr>`;
+                }).join('');
             }
         }
 
-        // ---- Confirm Modal ----
-        function showConfirm() {
-            document.getElementById('confirmModal').classList.add('show');
+        function showModal() {
+            document.getElementById('modalBg').classList.add('show');
         }
 
-        function hideConfirm() {
-            document.getElementById('confirmModal').classList.remove('show');
+        function hideModal() {
+            document.getElementById('modalBg').classList.remove('show');
         }
 
-        function clearAllData() {
+        function clearAll() {
             localStorage.removeItem(DB_KEY);
-            hideConfirm();
+            hideModal();
             renderAll();
         }
 
-        // ---- Export CSV ----
         function exportCSV() {
             const db = getDB();
             const ips = Object.keys(db.ips);
+            if (ips.length === 0) { alert('No data to export.'); return; }
 
-            if (ips.length === 0) {
-                alert('No data to export.');
-                return;
-            }
-
-            let csv = 'IP/Fingerprint,First Download,Last Attempt,Total Attempts,Counted As\n';
-
+            let csv = 'IP,First Download,Last Attempt,Attempts\n';
             ips.forEach(ip => {
                 const info = db.ips[ip];
-                const lastAttempt = info.lastAttempt || info.firstDownload;
-                csv += `"${ip}","${info.firstDownload}","${lastAttempt}",${info.attempts},1\n`;
+                csv += `"${ip}","${info.firstDownload}","${info.lastAttempt || info.firstDownload}",${info.attempts}\n`;
             });
 
-            csv += '\n\n--- Full Log ---\n';
-            csv += 'IP/Fingerprint,Timestamp,Counted\n';
-
-            (db.log || []).forEach(entry => {
-                csv += `"${entry.ip}","${entry.timestamp}",${entry.counted ? 'Yes' : 'No'}\n`;
+            csv += '\nIP,Timestamp,Counted\n';
+            (db.log || []).forEach(e => {
+                csv += `"${e.ip}","${e.timestamp}",${e.counted ? 'Yes' : 'No'}\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'tdm_downloads_report.csv';
+            a.download = 'tdm_report.csv';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
 
-        // ---- Auto Refresh ----
-        let countdownValue = 5;
+        // Auto refresh
+        let cd = 5;
+        setInterval(() => {
+            cd--;
+            if (cd <= 0) { cd = 5; renderAll(); }
+            document.getElementById('countdown').textContent = cd;
+        }, 1000);
 
-        function startAutoRefresh() {
-            setInterval(() => {
-                countdownValue--;
-                if (countdownValue <= 0) {
-                    countdownValue = 5;
-                    renderAll();
-                }
-                document.getElementById('countdown').textContent = countdownValue;
-            }, 1000);
-        }
-
-        // ---- Init ----
         renderAll();
-        startAutoRefresh();
     </script>
 </body>
 </html>

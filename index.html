@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TDM Book - Download</title>
+    <title>TDM - Hamza Abu Nawara</title>
     <style>
         * {
             margin: 0;
@@ -12,220 +12,126 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
-            overflow: hidden;
-        }
-
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            animation: float linear infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            max-width: 600px;
             padding: 20px;
         }
 
-        .book-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
+        .container {
+            background: #fff;
+            border-radius: 12px;
             padding: 50px 40px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
         }
 
-        .book-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 35px 80px rgba(0, 0, 0, 0.6);
-        }
-
-        .book-icon {
-            width: 120px;
-            height: 160px;
-            background: linear-gradient(145deg, #667eea, #764ba2);
-            border-radius: 8px 16px 16px 8px;
+        .book-cover {
+            width: 100px;
+            height: 130px;
+            background: #2563eb;
+            border-radius: 4px 10px 10px 4px;
             margin: 0 auto 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            box-shadow: -5px 5px 20px rgba(102, 126, 234, 0.4);
-            transition: transform 0.3s ease;
+            box-shadow: 3px 3px 15px rgba(37, 99, 235, 0.25);
         }
 
-        .book-icon:hover {
-            transform: rotate(-5deg) scale(1.05);
-        }
-
-        .book-icon::before {
+        .book-cover::before {
             content: '';
             position: absolute;
             left: 0;
-            top: 5%;
-            bottom: 5%;
-            width: 4px;
-            background: rgba(255, 255, 255, 0.3);
+            top: 4%;
+            bottom: 4%;
+            width: 3px;
+            background: rgba(255, 255, 255, 0.25);
             border-radius: 2px;
         }
 
-        .book-icon span {
-            font-size: 28px;
-            font-weight: 800;
+        .book-cover span {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 700;
             letter-spacing: 2px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
-        .book-icon .pdf-badge {
+        .pdf-tag {
             position: absolute;
-            bottom: -10px;
-            right: -10px;
-            background: #e74c3c;
-            color: white;
-            font-size: 11px;
+            bottom: -8px;
+            right: -8px;
+            background: #dc2626;
+            color: #fff;
+            font-size: 10px;
             font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.5);
+            padding: 3px 8px;
+            border-radius: 4px;
         }
 
         h1 {
-            font-size: 2.2em;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #667eea, #764ba2, #f093fb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 1.6em;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            font-weight: 700;
         }
 
-        .subtitle {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 1em;
-            margin-bottom: 35px;
-            line-height: 1.6;
+        .author {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 30px;
         }
 
         .download-btn {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            gap: 10px;
+            background: #2563eb;
+            color: #fff;
             border: none;
-            padding: 18px 45px;
-            font-size: 1.1em;
+            padding: 14px 36px;
+            font-size: 1em;
             font-weight: 600;
-            border-radius: 50px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.2s ease;
             text-decoration: none;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .download-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .download-btn:hover::before {
-            left: 100%;
         }
 
         .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+            background: #1d4ed8;
         }
 
         .download-btn:active {
-            transform: translateY(0);
+            background: #1e40af;
         }
 
         .download-btn svg {
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             fill: currentColor;
         }
 
-        .download-btn.downloading {
-            pointer-events: none;
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4);
-        }
-
-        .stats {
-            margin-top: 30px;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        .stat-label {
-            font-size: 0.8em;
-            color: rgba(255, 255, 255, 0.4);
-            margin-top: 4px;
+        .download-btn.done {
+            background: #16a34a;
         }
 
         .toast {
             position: fixed;
-            bottom: 30px;
+            bottom: 25px;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(46, 204, 113, 0.95);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 12px;
-            font-weight: 600;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform: translateX(-50%) translateY(80px);
+            background: #1a1a1a;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: transform 0.3s ease;
             z-index: 100;
         }
 
@@ -234,53 +140,30 @@
         }
 
         @media (max-width: 480px) {
-            .book-card {
+            .container {
                 padding: 35px 25px;
-            }
-            h1 {
-                font-size: 1.6em;
-            }
-            .download-btn {
-                padding: 15px 35px;
-                font-size: 1em;
             }
         }
     </style>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
 
     <div class="container">
-        <div class="book-card">
-            <div class="book-icon">
-                <span>TDM</span>
-                <div class="pdf-badge">PDF</div>
-            </div>
-            <h1>TDM Book</h1>
-            <p class="subtitle">Click the button below to download your copy of TDM.pdf</p>
-            <button class="download-btn" id="downloadBtn" onclick="handleDownload()">
-                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                <span id="btnText">Download PDF</span>
-            </button>
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-number" id="downloadCount">—</div>
-                    <div class="stat-label">Unique Downloads</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">PDF</div>
-                    <div class="stat-label">Format</div>
-                </div>
-            </div>
+        <div class="book-cover">
+            <span>TDM</span>
+            <div class="pdf-tag">PDF</div>
         </div>
+        <h1>TDM Book</h1>
+        <p class="author">By Hamza Abu Nawara</p>
+        <button class="download-btn" id="downloadBtn" onclick="handleDownload()">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            <span id="btnText">Download PDF</span>
+        </button>
     </div>
 
-    <div class="toast" id="toast">✓ Download recorded! Thank you.</div>
+    <div class="toast" id="toast"></div>
 
     <script>
-        // ============================================
-        // IN-MEMORY DATABASE (shared via localStorage)
-        // ============================================
         const DB_KEY = 'tdm_downloads_db';
 
         function getDB() {
@@ -296,152 +179,85 @@
             localStorage.setItem(DB_KEY, JSON.stringify(db));
         }
 
-        // Get a pseudo-unique fingerprint (since we can't get real IP from pure HTML)
-        // This uses a combination of browser properties as a "fake IP" / fingerprint
-        function getVisitorFingerprint() {
+        function getFingerprint() {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             ctx.textBaseline = 'top';
             ctx.font = '14px Arial';
-            ctx.fillText('fingerprint', 2, 2);
-            const canvasData = canvas.toDataURL();
-
+            ctx.fillText('fp', 2, 2);
+            const cd = canvas.toDataURL().slice(-50);
             const raw = [
                 navigator.userAgent,
                 navigator.language,
                 screen.width + 'x' + screen.height,
                 screen.colorDepth,
                 new Date().getTimezoneOffset(),
-                navigator.hardwareConcurrency || 'unknown',
-                canvasData.slice(-50)
+                navigator.hardwareConcurrency || '',
+                cd
             ].join('|');
-
-            // Simple hash
             let hash = 0;
             for (let i = 0; i < raw.length; i++) {
-                const char = raw.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
+                hash = ((hash << 5) - hash) + raw.charCodeAt(i);
                 hash = hash & hash;
             }
-            // Format as fake IP-like identifier
-            const positive = Math.abs(hash);
-            return [
-                (positive >> 24) & 255,
-                (positive >> 16) & 255,
-                (positive >> 8) & 255,
-                positive & 255
-            ].join('.');
+            const p = Math.abs(hash);
+            return [(p >> 24) & 255, (p >> 16) & 255, (p >> 8) & 255, p & 255].join('.');
         }
 
-        // Also try to get real public IP from a free API
         let realIP = null;
-
-        async function fetchRealIP() {
+        (async function () {
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
                 const data = await res.json();
                 realIP = data.ip;
-            } catch (e) {
-                // If blocked, we'll use fingerprint
-                realIP = null;
-            }
+            } catch (e) { }
+        })();
+
+        function getID() {
+            return realIP || getFingerprint();
         }
 
-        fetchRealIP();
-
-        function getIdentifier() {
-            return realIP || getVisitorFingerprint();
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
         }
 
-        // Load current count on page load
-        function updateDisplayCount() {
-            const db = getDB();
-            const uniqueCount = Object.keys(db.ips).length;
-            document.getElementById('downloadCount').textContent = uniqueCount;
-        }
-
-        updateDisplayCount();
-
-        // ============================================
-        // DOWNLOAD HANDLER
-        // ============================================
         function handleDownload() {
             const btn = document.getElementById('downloadBtn');
             const btnText = document.getElementById('btnText');
-            const toast = document.getElementById('toast');
-
-            // Get identifier
-            const ip = getIdentifier();
+            const ip = getID();
             const db = getDB();
             const now = new Date().toISOString();
             let isNew = false;
 
-            // Check if this IP already exists
             if (!db.ips[ip]) {
-                db.ips[ip] = {
-                    firstDownload: now,
-                    attempts: 1
-                };
+                db.ips[ip] = { firstDownload: now, attempts: 1 };
                 isNew = true;
             } else {
                 db.ips[ip].attempts += 1;
                 db.ips[ip].lastAttempt = now;
             }
 
-            // Log every attempt (for admin detail view)
-            db.log.push({
-                ip: ip,
-                timestamp: now,
-                counted: isNew
-            });
-
+            db.log.push({ ip: ip, timestamp: now, counted: isNew });
             saveDB(db);
-            updateDisplayCount();
 
-            // Button animation
-            btn.classList.add('downloading');
+            btn.classList.add('done');
             btnText.textContent = 'Downloading...';
+            showToast('✓ Download started');
 
-            // Show toast
-            toast.textContent = isNew
-                ? '✓ Download recorded! Thank you.'
-                : '✓ Already counted — downloading again.';
-            toast.classList.add('show');
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-
-            // Trigger actual file download
             setTimeout(() => {
                 const link = document.createElement('a');
-                link.href = 'TDM.pdf'; // <-- Make sure TDM.pdf is in the same folder
+                link.href = 'TDM.pdf';
                 link.download = 'TDM.pdf';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-
-                btn.classList.remove('downloading');
+                btn.classList.remove('done');
                 btnText.textContent = 'Download PDF';
-            }, 1000);
+            }, 800);
         }
-
-        // ============================================
-        // PARTICLES BACKGROUND
-        // ============================================
-        (function createParticles() {
-            const container = document.getElementById('particles');
-            for (let i = 0; i < 50; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.width = p.style.height = (Math.random() * 4 + 2) + 'px';
-                p.style.animationDuration = (Math.random() * 10 + 8) + 's';
-                p.style.animationDelay = (Math.random() * 10) + 's';
-                p.style.opacity = Math.random() * 0.5;
-                container.appendChild(p);
-            }
-        })();
     </script>
 </body>
 </html>
